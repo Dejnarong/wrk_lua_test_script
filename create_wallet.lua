@@ -12,6 +12,15 @@ b64Signature = nil
 jsonObj = {}
 sendObj = {}
 
+local t_counter = 1
+local threads = {}
+
+function setup(thread)
+   thread:set("id", t_counter)
+   table.insert(threads, thread)
+   t_counter = t_counter + 1
+end
+
 function init(args)
   privKey = openssl.pkey.read(pkey, true)
   provider1PrivateKey = openssl.pkey.read(provider1PrivateKeyRaw, true)
@@ -25,6 +34,7 @@ function init(args)
 		wallet_public_key_signature = b64Signature
   }
   sendObj = JSON:encode(jsonObj)
+  --print(id)
   --print(sendObj)
 end
 
@@ -52,9 +62,13 @@ request = function()
   return wrk.format("POST", path, nil,req_body)
 end
 
--- function response(status, headers, body)
---   print(body)
--- end
+function response(status, headers, body)
+  -- print(body)
+  file = io.open("res/create_wallet/responseCreateWalllet_" .. id .. ".txt", "a+")
+  file:write(body,"\n")
+  file:flush()
+  file:close()
+end
 
 
 
